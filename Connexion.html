@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CCI-BF – Connexion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="Connexion.css"/>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ════════════════ PANNEAU GAUCHE ════════════════ -->
+  <div class="panel-left">
+
+    <!-- Motifs géométriques animés -->
+    <svg class="geo-canvas" viewBox="0 0 600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <!-- Grands cercles tournants -->
+      <circle class="geo-circle" cx="480" cy="180" r="220" stroke-width="1"/>
+      <circle class="geo-circle" cx="480" cy="180" r="160" stroke-width="0.5"/>
+      <circle class="geo-circle-2" cx="100" cy="700" r="280" stroke-width="1.5"/>
+      <circle class="geo-circle-2" cx="100" cy="700" r="200" stroke-width="0.8"/>
+
+      <!-- Hexagones -->
+      <polygon class="geo-hex" points="300,80 350,108 350,165 300,193 250,165 250,108" stroke-width="1.5"/>
+      <polygon class="geo-hex" points="480,600 510,617 510,652 480,669 450,652 450,617" stroke-width="1"/>
+
+      <!-- Lignes diagonales -->
+      <line x1="0" y1="450" x2="600" y2="250" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+      <line x1="0" y1="500" x2="600" y2="300" stroke="rgba(255,255,255,.03)" stroke-width="1"/>
+
+      <!-- Points flottants -->
+      <circle class="geo-dot" cx="80"  cy="120" r="5"/>
+      <circle class="geo-dot" cx="520" cy="380" r="4" style="animation-delay:2s"/>
+      <circle class="geo-dot" cx="200" cy="820" r="6" style="animation-delay:4s"/>
+      <circle class="geo-dot" cx="400" cy="520" r="3" style="animation-delay:1s"/>
+
+      <!-- Petites croix décoratives -->
+      <g stroke="rgba(255,255,255,.1)" stroke-width="1.5" stroke-linecap="round">
+        <line x1="140" y1="390" x2="155" y2="390"/><line x1="147" y1="383" x2="147" y2="397"/>
+        <line x1="490" y1="440" x2="502" y2="440"/><line x1="496" y1="434" x2="496" y2="446"/>
+      </g>
+
+      <!-- Arc vert lumineux en bas à droite -->
+      <circle cx="560" cy="860" r="140" fill="none" stroke="rgba(46,204,113,.08)" stroke-width="40"/>
+    </svg>
+
+    <!-- Haut : logo -->
+    <div class="left-top">
+      <div class="logo-wrap">
+        <div class="logo-circle">CCI</div>
+        <div class="logo-text">
+          CCI-BF
+          <small>Chambre de Commerce et d'Industrie du Burkina Faso</small>
+        </div>
+      </div>
+
+      <div class="left-headline">
+        <h1>Votre espace<br/><em>administrateur/ superviseur</em><br/>sécurisé.</h1>
+        <div class="deco-line"></div>
+        <p>Gérez vos carrousels, partenaires et représentants depuis une interface unifiée, moderne et performante.</p>
+      </div>
+    </div>
+
+    <!-- Bas : stats + copyright -->
+    <div class="left-bottom">
+      
+
+      <div class="left-footer-text" style="margin-top:28px;">
+        © 2026 CCI-BF — Tous droits réservés
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════════ PANNEAU DROIT ════════════════ -->
+  <div class="panel-right">
+    <div class="form-wrap">
+
+      <div class="form-greeting">
+        <div class="eyebrow">Portail Administrateur/ Superviseur</div>
+        <h2>Bon retour</h2>
+        <p>Connectez-vous pour accéder au tableau de bord.</p>
+      </div>
+
+      <!-- Message erreur -->
+      <div class="error-msg" id="errorMsg">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 8v4m0 4h.01"/>
+        </svg>
+        <span id="errorText">Email ou mot de passe incorrect.</span>
+      </div>
+
+      <!-- Champ email -->
+      <div class="field">
+        <label for="email">Adresse email</label>
+        <div class="input-wrap">
+          <input type="email" id="email" placeholder="adminmichael@gmail.com" autocomplete="email"/>
+          <svg class="input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Champ mot de passe -->
+      <div class="field">
+        <label for="password">Mot de passe</label>
+        <div class="input-wrap">
+          <input type="password" id="password" placeholder="**********" autocomplete="current-password"/>
+          <svg class="input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+          <button class="pwd-toggle" type="button" onclick="togglePwd()" id="pwdToggle" aria-label="Afficher le mot de passe">
+            <svg id="eyeIcon" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Options -->
+      <div class="field-options">
+        <label class="remember">
+          <input type="checkbox" id="rememberMe"/>
+          <div class="check-box">
+            <svg class="check-icon" width="10" height="10" fill="none" stroke="white" stroke-width="3" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          Se souvenir de moi
+        </label>
+        <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+      </div>
+
+      <!-- Bouton -->
+      <button class="btn-login" id="loginBtn" onclick="handleLogin()">
+        <div class="btn-content">
+          <div class="btn-spinner"></div>
+          <span class="btn-text">Se connecter</span>
+        </div>
+      </button>
+
+      <!-- Pied -->
+      <div class="form-footer">
+        <div class="security-badge">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+          Connexion sécurisée SSL — CCI-BF Admin/Super Version 1.0
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ─── Toggle afficher/masquer mot de passe ────
+  function togglePwd() {
+    const input = document.getElementById('password');
+    const icon  = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.innerHTML = `
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>`;
+    } else {
+      input.type = 'password';
+      icon.innerHTML = `
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>`;
+    }
+  }
+
+  // ─── Connexion (logique front) ───────────────
+function handleLogin() {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  fetch('http://localhost:3000/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  })
+  .then(res => res.json())
+  .then(data => {
+  if (data.token) {
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('role', data.role);
+    localStorage.setItem('nom', data.nom); // <-- stocker le nom
+
+    if (data.role === 1) {
+      window.location.href = 'Admin.html';
+    } else {
+      window.location.href = 'Admin.html';
+    }
+  } else {
+    showError(data.message || 'Erreur de connexion');
+  }
+})
+
+  .catch(err => {
+    showError('Erreur serveur');
+    console.error(err);
+  });
+}
+
+
+
+  function showError(msg) {
+    document.getElementById('errorText').textContent = msg;
+    document.getElementById('errorMsg').classList.add('show');
+  }
+
+  // ─── Submit via Entrée ───────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+</script>
+
+</body>
+</html>
