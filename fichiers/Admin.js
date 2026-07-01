@@ -1,3 +1,6 @@
+const API_URL = "https://la-chambre-de-commerce.onrender.com";
+const PANELADMIN_URL = "https://paneladmin-1.onrender.com";
+
 const form = document.getElementById('carrouselForm');
 const preview = document.getElementById('preview');
 const openBtn = document.getElementById('openModalBtn');
@@ -7,32 +10,24 @@ const partenaireForm = document.getElementById('partenaireForm');
 const checkbox = document.getElementById('actifCheckbox');
 const statusText = document.getElementById('statusText');
 
-const data = {
-  texte: form.texte.value,
-  image_uri: form.image_uri.value,
-  description: form.description.value,
-  actif: form.actif.checked ? 1 : 0
-};
-
 openBtn.addEventListener('click', () => {
-  form.classList.toggle('hidden'); // ajoute/enlève la classe
+  form.classList.toggle('hidden');
   form.classList.toggle('show');
 });
 openPartenaire.addEventListener('click', () => {
-   partenaireForm.classList.toggle('hiddenPartenaire'); 
-   partenaireForm.classList.toggle('showPartenaire'); 
-  });
-
-checkbox.addEventListener('change', () => { 
-  if (checkbox.checked) { 
-    statusText.textContent = 'Actif'; 
-    statusText.classList.remove('inactif');
-   } else { 
-    statusText.textContent = 'Inactif'; 
-    statusText.classList.add('inactif'); 
-  } 
+  partenaireForm.classList.toggle('hiddenPartenaire');
+  partenaireForm.classList.toggle('showPartenaire');
 });
 
+checkbox.addEventListener('change', () => {
+  if (checkbox.checked) {
+    statusText.textContent = 'Actif';
+    statusText.classList.remove('inactif');
+  } else {
+    statusText.textContent = 'Inactif';
+    statusText.classList.add('inactif');
+  }
+});
 
 form.image_uri.addEventListener('input', () => {
   const url = form.image_uri.value;
@@ -49,42 +44,39 @@ form.addEventListener('submit', async (e) => {
     actif: form.actif.checked ? 1 : 0
   };
 
-  const res = await fetch('http://192.168.112.215:3000/carousels', {
+  const res = await fetch(`${API_URL}/carousels`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
 
   const result = await res.json();
-  alert(' Carrousel ajouté !');
+  alert('Carrousel ajouté !');
   form.reset();
   preview.innerHTML = '';
+  fetchCarrousels();
 });
 
 async function updateDashboardStats() {
   try {
-    // Carrousels
-    const resCarrousels = await fetch('http://192.168.112.215:3000/carousels');
+    const resCarrousels = await fetch(`${API_URL}/carousels`);
     const carrousels = await resCarrousels.json();
     document.querySelector('#dashboardCarrouselsCount').textContent = carrousels.length;
 
-    // Partenaires
-    const resPartenaires = await fetch('http://192.168.112.215:3000/partenaires');
+    const resPartenaires = await fetch(`${API_URL}/partenaires`);
     const partenaires = await resPartenaires.json();
     document.querySelector('#dashboardPartenairesCount').textContent = partenaires.length;
 
-    // Représentations
-    const resReps = await fetch('http://192.168.112.215:3000/representations');
+    const resReps = await fetch(`${API_URL}/representations`);
     const reps = await resReps.json();
     document.querySelector('#dashboardRepresentationsCount').textContent = reps.length;
   } catch (err) {
     console.error("Erreur dashboard:", err);
   }
-  
 }
 
 async function renderCarrousels() {
-  const res = await fetch('http://192.168.112.215:3000/carousels');
+  const res = await fetch(`${API_URL}/carousels`);
   const data = await res.json();
 
   const grid = document.getElementById('carrouselGrid');
@@ -97,15 +89,13 @@ async function renderCarrousels() {
       <div class="carrousel-thumb">
         <img src="${c.image_uri}" alt="${c.texte}" style="width:100%; height:120px; object-fit:cover; border-radius:8px;" />
       </div>
-      
     `;
     grid.appendChild(card);
   });
 }
 
-
 async function renderPartenaires() {
-  const res = await fetch('http://192.168.112.215:3000/partenaires');
+  const res = await fetch(`${API_URL}/partenaires`);
   const partenaires = await res.json();
 
   const tbody = document.getElementById('partenaireTableBody');
@@ -123,11 +113,8 @@ async function renderPartenaires() {
   });
 }
 
-
-
-
 async function fetchCarrousels() {
-  const res = await fetch('http://192.168.112.215:3000/carousels');
+  const res = await fetch(`${API_URL}/carousels`);
   const data = await res.json();
 
   const list = document.getElementById('carrouselList');
@@ -137,17 +124,12 @@ async function fetchCarrousels() {
     const card = document.createElement('div');
     card.className = 'carrousel-full-card';
     card.innerHTML = `
-      <!-- Image en haut -->
       <div class="carrousel-full-thumb">
         <img src="${c.image_uri}" alt="${c.texte}" />
       </div>
-
-      <!-- Titre + description -->
       <div class="carrousel-full-body">
         <div class="carrousel-full-name">${c.texte}</div>
       </div>
-
-      <!-- Footer avec toggle + actions -->
       <div class="carrousel-full-footer">
         <div style="display:flex;align-items:center;gap:8px;">
           <label class="toggle">
@@ -157,10 +139,7 @@ async function fetchCarrousels() {
           <span class="toggle-text">${c.actif ? 'Actif' : 'Inactif'}</span>
         </div>
         <div class="carrousel-actions">
-          <button class="btn-action btn-edit" 
-  onclick="editCarrousel(${c.id})">
-  Modifier
-</button>
+          <button class="btn-action btn-edit" onclick="editCarrousel(${c.id})">Modifier</button>
           <button class="btn-action btn-delete" onclick="deleteCarrousel(${c.id})">Supprimer</button>
         </div>
       </div>
@@ -169,29 +148,19 @@ async function fetchCarrousels() {
   });
   updateDashboardStats();
   renderCarrousels();
-
 }
-
-
 
 async function deleteCarrousel(id) {
   if (!confirm('Confirmer la suppression ?')) return;
-
-  await fetch(`http://192.168.112.215:3000/carousels/${id}`, {
-    method: 'DELETE'
-  });
-
-  alert(' Carrousel supprimé');
-  fetchCarrousels(); // recharge la liste
+  await fetch(`${API_URL}/carousels/${id}`, { method: 'DELETE' });
+  alert('Carrousel supprimé');
+  fetchCarrousels();
 }
 
-// Appel initial
 fetchCarrousels();
 
-
-
 async function editCarrousel(id) {
-  const res = await fetch(`http://192.168.112.215:3000/carousels/${id}`);
+  const res = await fetch(`${API_URL}/carousels/${id}`);
   const c = await res.json();
 
   const form = document.getElementById('editForm');
@@ -218,21 +187,20 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
     actif: form.actif.checked ? 1 : 0
   };
 
-  await fetch(`http://192.168.112.215:3000/carousels/${form.id.value}`, {
+  await fetch(`${API_URL}/carousels/${form.id.value}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
 
-  alert(' Carrousel mis à jour');
+  alert('Carrousel mis à jour');
   form.reset();
   form.style.display = 'none';
   fetchCarrousels();
 });
 
-
 async function fetchPartenaires() {
-  const res = await fetch('http://192.168.112.215:3000/partenaires');
+  const res = await fetch(`${API_URL}/partenaires`);
   const partenaires = await res.json();
 
   const list = document.getElementById('partenaireList');
@@ -241,28 +209,25 @@ async function fetchPartenaires() {
   partenaires.forEach(p => {
     const item = document.createElement('div');
     item.className = '';
-        item.innerHTML = `
-        <div class="partenaire-item">
+    item.innerHTML = `
+      <div class="partenaire-item">
         <img src="${p.logo_uri}" alt="${p.nom}" />
         <div class="partenaire-info">
           <p><strong>${p.nom}</strong></p>
           <a href="${p.lien}" target="_blank">${p.lien}</a>
           <button onclick="editPartenaire(${p.id}, '${p.nom.replace(/'/g, "\\'")}', '${p.logo_uri}', '${p.lien}', ${p.actif})">📝 Modifier</button>
-          <button onclick="deletePartenaire(${p.id})"> Supprimer</button>
+          <button onclick="deletePartenaire(${p.id})">Supprimer</button>
         </div>
       </div>
     `;
-
     list.appendChild(item);
   });
   updateDashboardStats();
   renderPartenaires();
-
 }
 
 document.getElementById('partenaireForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-    console.log(' Formulaire partenaire soumis'); // ← log de test
   const form = e.target;
 
   const data = {
@@ -272,13 +237,13 @@ document.getElementById('partenaireForm').addEventListener('submit', async (e) =
     actif: form.actif.checked ? 1 : 0
   };
 
-  await fetch('http://192.168.112.215:3000/partenaires', {
+  await fetch(`${API_URL}/partenaires`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
 
-  alert(' Partenaire ajouté');
+  alert('Partenaire ajouté');
   form.reset();
   fetchPartenaires();
 });
@@ -304,7 +269,7 @@ document.getElementById('editPartenaireForm').addEventListener('submit', async (
     actif: form.actif.checked ? 1 : 0
   };
 
-  await fetch(`http://192.168.112.215:3000/partenaires/${form.id.value}`, {
+  await fetch(`${API_URL}/partenaires/${form.id.value}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
@@ -318,16 +283,11 @@ document.getElementById('editPartenaireForm').addEventListener('submit', async (
 
 async function deletePartenaire(id) {
   if (!confirm('Confirmer la suppression ?')) return;
-
-  await fetch(`http://192.168.112.215:3000/partenaires/${id}`, {
-    method: 'DELETE'
-  });
-
-  alert(' Partenaire supprimé');
+  await fetch(`${API_URL}/partenaires/${id}`, { method: 'DELETE' });
+  alert('Partenaire supprimé');
   fetchPartenaires();
 }
 
-// Appel initial
 fetchPartenaires();
 
 const representationForm = document.getElementById('representationForm');
@@ -343,57 +303,52 @@ representationForm.addEventListener('submit', async (e) => {
     actif: representationForm.actif.checked ? 1 : 0
   };
 
-  await fetch('http://192.168.112.215:3000/representations', {
+  await fetch(`${API_URL}/representations`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
 
-  alert(' Représentation ajoutée');
+  alert('Représentation ajoutée');
   representationForm.reset();
   fetchRepresentations();
 });
 
-
-
 async function fetchRepresentations() {
-  const res = await fetch('http://192.168.112.215:3000/representations');
+  const res = await fetch(`${API_URL}/representations`);
   const data = await res.json();
   list.innerHTML = '';
 
   data.forEach(r => {
     const item = document.createElement('div');
-   const typeClass = r.type === 'international' 
-  ? 'rep-type international' 
-  : r.type === 'national' 
-    ? 'rep-type national' 
-    : 'rep-type frontalier';
+    const typeClass = r.type === 'international'
+      ? 'rep-type international'
+      : r.type === 'national'
+        ? 'rep-type national'
+        : 'rep-type frontalier';
 
-item.className = 'rep-card';
-item.innerHTML = `
-  <div class="rep-header">
-    <strong class="rep-name">${r.name}</strong>
-    <span class="${typeClass}">${r.type}</span>
-  </div>
-  <div class="rep-body">
-    <p class="rep-phone"> ${r.phone}</p>
-    <p class="rep-location"> ${r.locationUrl || '-'}</p>
-  </div>
-  <div class="rep-footer">
-    <span class="badge ${r.actif ? 'badge-actif' : 'badge-inactif'}">
-      ${r.actif ? 'Actif' : 'Inactif'}
-    </span>
-    <div class="rep-actions">
-      <button class="btn-action btn-edit"
-        onclick="editRepresentation(${r.id}, '${r.name.replace(/'/g,"\\'")}', '${r.phone}', '${r.locationUrl}', '${r.type}', ${r.actif})"> Modifier</button>
-      <button class="btn-action btn-delete"
-        onclick="deleteRepresentation(${r.id})"> Supprimer</button>
-    </div>
-  </div>
-`;
-
-
-
+    item.className = 'rep-card';
+    item.innerHTML = `
+      <div class="rep-header">
+        <strong class="rep-name">${r.name}</strong>
+        <span class="${typeClass}">${r.type}</span>
+      </div>
+      <div class="rep-body">
+        <p class="rep-phone">${r.phone}</p>
+        <p class="rep-location">${r.locationUrl || '-'}</p>
+      </div>
+      <div class="rep-footer">
+        <span class="badge ${r.actif ? 'badge-actif' : 'badge-inactif'}">
+          ${r.actif ? 'Actif' : 'Inactif'}
+        </span>
+        <div class="rep-actions">
+          <button class="btn-action btn-edit"
+            onclick="editRepresentation(${r.id}, '${r.name.replace(/'/g,"\\'")}', '${r.phone}', '${r.locationUrl}', '${r.type}', ${r.actif})">Modifier</button>
+          <button class="btn-action btn-delete"
+            onclick="deleteRepresentation(${r.id})">Supprimer</button>
+        </div>
+      </div>
+    `;
     list.appendChild(item);
   });
   updateDashboardStats();
@@ -422,38 +377,28 @@ document.getElementById('editRepresentationForm').addEventListener('submit', asy
     actif: form.actif.checked ? 1 : 0
   };
 
-  await fetch(`http://192.168.112.215:3000/representations/${form.id.value}`, {
+  await fetch(`${API_URL}/representations/${form.id.value}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
 
-  alert(' Représentation mise à jour');
+  alert('Représentation mise à jour');
   form.reset();
   form.style.display = 'none';
   fetchRepresentations();
 });
 
-
 async function deleteRepresentation(id) {
   if (!confirm('Confirmer la suppression ?')) return;
-  await fetch(`http://192.168.112.215:3000/representations/${id}`, {
-    method: 'DELETE'
-  });
-  alert(' Supprimé');
+  await fetch(`${API_URL}/representations/${id}`, { method: 'DELETE' });
+  alert('Supprimé');
   fetchRepresentations();
 }
 
-// Appel initial
 fetchRepresentations();
 
-
-
-
-
-// ─── NAVIGATION SPA ───────────────────────────────────────────
- function navigateTo(viewName, navEl) {
-  // Cas particulier : page externe
+function navigateTo(viewName, navEl) {
   if (viewName === 'Inscription') {
     window.location.href = 'Inscription.html';
     return;
@@ -463,7 +408,6 @@ fetchRepresentations();
     return;
   }
 
-  // Cas normal : navigation interne
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const target = document.getElementById('view-' + viewName);
   if (target) {
@@ -476,68 +420,47 @@ fetchRepresentations();
   }
 }
 
-
-
-  // ─── TOGGLE LABEL ─────────────────────────────────────────────
-  function updateToggleLabel(input) {
-    const footer = input.closest('.carrousel-footer') || input.closest('.carrousel-full-footer');
-    const text = footer ? footer.querySelector('.toggle-text') : null;
-    if (text) {
-      if (input.checked) {
-        text.textContent = 'Actif';
-        text.style.color = 'var(--green-dark)';
-      } else {
-        text.textContent = 'Inactif';
-        text.style.color = 'var(--muted)';
-      }
+function updateToggleLabel(input) {
+  const footer = input.closest('.carrousel-footer') || input.closest('.carrousel-full-footer');
+  const text = footer ? footer.querySelector('.toggle-text') : null;
+  if (text) {
+    if (input.checked) {
+      text.textContent = 'Actif';
+      text.style.color = 'var(--green-dark)';
+    } else {
+      text.textContent = 'Inactif';
+      text.style.color = 'var(--muted)';
     }
   }
-
-
- document.addEventListener('DOMContentLoaded', () => {
-  const nom = localStorage.getItem('nom');
-  if (nom) {
-    document.getElementById('adminName').textContent = nom;
-  }
-});
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Afficher le nom
   const nom = localStorage.getItem('nom');
   if (nom) {
     document.getElementById('adminName').textContent = nom;
   }
 
-  // Afficher le rôle
   const role = localStorage.getItem('role');
   if (role) {
     let roleText;
     switch (role) {
       case '1':
-        roleText = ' Administrateur';
+        roleText = 'Administrateur';
         break;
       case '2':
-        roleText = ' Superviseur';
+        roleText = 'Superviseur';
         break;
       default:
         roleText = 'Inconnu';
     }
     document.getElementById('adminRole').textContent = roleText;
   }
-});
 
-
-document.addEventListener('DOMContentLoaded', () => {
-  const role = localStorage.getItem('role'); // récupère le rôle
-
-  // Si le rôle est "2" (Superviseur), on cache la section comptes
   if (role === '2') {
     const comptesSection = document.getElementById('view-comptes');
     if (comptesSection) {
       comptesSection.style.display = 'none';
     }
-
-    // On peut aussi désactiver le bouton dans la sidebar
     const comptesBtn = document.querySelector('button[onclick*="comptes"]');
     if (comptesBtn) {
       comptesBtn.disabled = true;
@@ -547,15 +470,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Charger les comptes
 async function fetchComptes() {
-  const res = await fetch('http://localhost:3000/users'); // adapte l’URL
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${PANELADMIN_URL}/users`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
   const comptes = await res.json();
   renderComptes(comptes);
   updateStats(comptes);
 }
 
-// Afficher cartes
 function renderComptes(comptes) {
   const grid = document.getElementById('comptes-grid');
   grid.innerHTML = '';
@@ -573,24 +497,20 @@ function renderComptes(comptes) {
   });
 }
 
-// Mapper rôle
 function mapRole(role_id) {
   switch(role_id) {
-    case 1: return ' Administrateur';
-    case 2: return ' Superviseur';
-   
+    case 1: return 'Administrateur';
+    case 2: return 'Superviseur';
     default: return 'Inconnu';
   }
 }
 
-// Stats
 function updateStats(comptes) {
   document.getElementById('count-total').textContent = comptes.length;
   document.getElementById('count-admin').textContent = comptes.filter(c => c.role_id === 1).length;
   document.getElementById('count-super').textContent = comptes.filter(c => c.role_id === 2).length;
 }
 
-// Recherche
 function filterComptes() {
   const term = document.getElementById('comptes-search').value.toLowerCase();
   document.querySelectorAll('.compte-card').forEach(card => {
@@ -600,7 +520,6 @@ function filterComptes() {
   });
 }
 
-// Filtres
 function filterComptesByRole(role, btn) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -610,13 +529,12 @@ function filterComptesByRole(role, btn) {
   });
 }
 
-// Modal
 function openCompteModal(compte) {
   document.getElementById('compte-modal-overlay').classList.add('show');
   document.getElementById('compte-modal-id').value = compte.id;
   document.getElementById('compte-modal-nom').value = compte.nom;
   document.getElementById('compte-modal-email').value = compte.email;
-  document.getElementById('compte-modal-role').value = mapRole(compte.role_id).split(' ')[1];
+  document.getElementById('compte-modal-role').value = mapRole(compte.role_id).split(' ')[0];
   document.getElementById('compte-modal-actif').checked = true;
 }
 function closeCompteModal() {
@@ -626,18 +544,21 @@ function closeCompteModalOnOverlay(e) {
   if (e.target.id === 'compte-modal-overlay') closeCompteModal();
 }
 
-// Soumission édition
 async function submitCompteEdit() {
   const id = document.getElementById('compte-modal-id').value;
+  const token = localStorage.getItem('token');
   const data = {
     nom: document.getElementById('compte-modal-nom').value,
     email: document.getElementById('compte-modal-email').value,
     role: document.getElementById('compte-modal-role').value,
     actif: document.getElementById('compte-modal-actif').checked ? 1 : 0
   };
-  await fetch(`http://localhost:3000/users/${id}`, {
+  await fetch(`${PANELADMIN_URL}/users/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
     body: JSON.stringify(data)
   });
   alert('Compte mis à jour');
@@ -645,16 +566,13 @@ async function submitCompteEdit() {
   fetchComptes();
 }
 
-// Init
 document.addEventListener('DOMContentLoaded', fetchComptes);
 
-const BASE_PLAINTES = 'http://192.168.112.215:3000'; // ton backend principal
 let currentPlainteId = null;
 
 async function fetchPlaintes() {
   try {
-    const res = await fetch(`${BASE_PLAINTES}/plaintes/liste`);
-
+    const res = await fetch(`${API_URL}/plaintes/liste`);
     const plaintes = await res.json();
     renderPlaintes(plaintes);
     updatePlaintesStats(plaintes);
@@ -665,9 +583,9 @@ async function fetchPlaintes() {
 
 function updatePlaintesStats(plaintes) {
   document.getElementById('count-plaintes-total').textContent = plaintes.length;
-  document.getElementById('count-plaintes-attente').textContent = 
+  document.getElementById('count-plaintes-attente').textContent =
     plaintes.filter(p => p.statut === 'nouveau' || !p.statut).length;
-  document.getElementById('count-plaintes-resolues').textContent = 
+  document.getElementById('count-plaintes-resolues').textContent =
     plaintes.filter(p => p.statut === 'resolu').length;
 }
 
@@ -682,9 +600,9 @@ function renderPlaintes(plaintes) {
 
   plaintes.forEach(p => {
     const statut = p.statut || 'nouveau';
-    const statutClass = statut === 'resolu' ? 'badge-actif' : 
+    const statutClass = statut === 'resolu' ? 'badge-actif' :
                         statut === 'en_cours' ? 'badge-orange' : 'badge-inactif';
-    const statutLabel = statut === 'resolu' ? 'Résolu' : 
+    const statutLabel = statut === 'resolu' ? 'Résolu' :
                         statut === 'en_cours' ? 'En cours' : 'Nouveau';
 
     const card = document.createElement('div');
@@ -693,36 +611,33 @@ function renderPlaintes(plaintes) {
     card.dataset.message = (p.message || '').toLowerCase();
     card.dataset.site = (p.sitePlainte || '').toLowerCase();
     card.innerHTML = `
-  <div class="plainte-header">
-    <div>
-      <strong class="plainte-site">${p.sitePlainte || '—'}</strong>
-      <span class="plainte-service"> › ${p.servicePlainte || '—'}</span>
-    </div>
-    <span class="badge ${statutClass}">${statutLabel}</span>
-  </div>
-
-  ${p.image_base64 ? `
-    <div class="plainte-thumb">
-      <img src="${p.image_base64}" alt="Pièce jointe" />
-    </div>` : ''}
-
-  <p class="plainte-message">${(p.message || '').substring(0, 120)}${p.message?.length > 120 ? '...' : ''}</p>
-  <div class="plainte-footer">
-    <span class="plainte-date">${p.date ? new Date(p.date).toLocaleDateString('fr-FR') : '—'}</span>
-    <div style="display:flex;gap:8px;">
-      <button class="btn-action btn-edit" onclick="openPlainteModal(${p.id})">Voir</button>
-      <button class="btn-action btn-delete" onclick="deletePlainte(${p.id})">Supprimer</button>
-    </div>
-  </div>
-`;
+      <div class="plainte-header">
+        <div>
+          <strong class="plainte-site">${p.sitePlainte || '—'}</strong>
+          <span class="plainte-service"> › ${p.servicePlainte || '—'}</span>
+        </div>
+        <span class="badge ${statutClass}">${statutLabel}</span>
+      </div>
+      ${p.image_base64 ? `
+        <div class="plainte-thumb">
+          <img src="${p.image_base64}" alt="Pièce jointe" />
+        </div>` : ''}
+      <p class="plainte-message">${(p.message || '').substring(0, 120)}${p.message?.length > 120 ? '...' : ''}</p>
+      <div class="plainte-footer">
+        <span class="plainte-date">${p.date ? new Date(p.date).toLocaleDateString('fr-FR') : '—'}</span>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-action btn-edit" onclick="openPlainteModal(${p.id})">Voir</button>
+          <button class="btn-action btn-delete" onclick="deletePlainte(${p.id})">Supprimer</button>
+        </div>
+      </div>
+    `;
     list.appendChild(card);
   });
 }
 
 async function openPlainteModal(id) {
   currentPlainteId = id;
-  const res = await fetch(`${BASE_PLAINTES}/plaintes/liste`);
-
+  const res = await fetch(`${API_URL}/plaintes/liste`);
   const plaintes = await res.json();
   const p = plaintes.find(pl => pl.id === id);
   if (!p) return;
@@ -733,18 +648,17 @@ async function openPlainteModal(id) {
       <div><strong>Site :</strong> ${p.sitePlainte || '—'}</div>
       <div><strong>Service :</strong> ${p.servicePlainte || '—'}</div>
       <div><strong>Message :</strong><p style="margin-top:6px;color:#555;line-height:1.6;">${p.message || '—'}</p></div>
-          ${p.image_base64 ? `
-            <div>
-              <strong>Pièce jointe :</strong><br/>
-              <img src="${p.image_base64}" 
-                  style="max-width:100%;border-radius:8px;margin-top:6px;" />
-            </div>` 
-          : p.image_uri ? `
-            <div>
-              <strong>Pièce jointe :</strong>
-              <span style="color:#aaa;font-size:13px;"> (fichier local non accessible)</span>
-            </div>` : ''} 
-              <div><strong>Date :</strong> ${p.date ? new Date(p.date).toLocaleString('fr-FR') : '—'}</div>
+      ${p.image_base64 ? `
+        <div>
+          <strong>Pièce jointe :</strong><br/>
+          <img src="${p.image_base64}" style="max-width:100%;border-radius:8px;margin-top:6px;" />
+        </div>`
+      : p.image_uri ? `
+        <div>
+          <strong>Pièce jointe :</strong>
+          <span style="color:#aaa;font-size:13px;"> (fichier local non accessible)</span>
+        </div>` : ''}
+      <div><strong>Date :</strong> ${p.date ? new Date(p.date).toLocaleString('fr-FR') : '—'}</div>
     </div>
   `;
   document.getElementById('plainte-modal-overlay').classList.add('show');
@@ -762,20 +676,20 @@ function closePlainteModalOnOverlay(e) {
 async function updatePlainteStatut() {
   if (!currentPlainteId) return;
   const statut = document.getElementById('plainte-modal-statut').value;
-  
+
   try {
-    const res = await fetch(`${BASE_PLAINTES}/plaintes/${currentPlainteId}/statut`, {
+    const res = await fetch(`${API_URL}/plaintes/${currentPlainteId}/statut`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ statut })
     });
 
     const data = await res.json();
-    
+
     if (data.success) {
       alert('Statut mis à jour !');
       closePlainteModal();
-      await fetchPlaintes(); // ✅ recharge toute la liste
+      await fetchPlaintes();
     } else {
       alert('Erreur : ' + (data.error || 'Statut non mis à jour'));
     }
@@ -787,7 +701,7 @@ async function updatePlainteStatut() {
 
 async function deletePlainte(id) {
   if (!confirm('Supprimer cette plainte ?')) return;
-  await fetch(`${BASE_PLAINTES}/plaintes/${id}`, { method: 'DELETE' });
+  await fetch(`${API_URL}/plaintes/${id}`, { method: 'DELETE' });
   alert('Plainte supprimée');
   fetchPlaintes();
 }
@@ -809,5 +723,4 @@ function filterPlaintesByStatut(statut, btn) {
   });
 }
 
-// Init
 document.addEventListener('DOMContentLoaded', fetchPlaintes);

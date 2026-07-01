@@ -179,7 +179,7 @@ function handleLogin() {
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
 
-  fetch('http://localhost:3000/login', {
+  fetch('https://paneladmin-1.onrender.com/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })

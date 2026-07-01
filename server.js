@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const pool = require('./db');
 const cors = require('cors');
 const app = express();
+app.use(express.static('fichiers'));
 app.use(bodyParser.json());
 app.use(cors());
 
