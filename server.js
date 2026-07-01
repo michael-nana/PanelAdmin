@@ -1,3 +1,5 @@
+require('dotenv').config(); // tout en haut du fichier, avant tout le reste
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
@@ -34,11 +36,7 @@ const validPassword = await bcrypt.compare(password, user.mot_de_passe);
       return res.status(401).json({ message: 'Mot de passe incorrect' });
     }
 
-    const token = jwt.sign(
-      { id: user.id, role: user.role_id },
-      'secret_key',
-      { expiresIn: '1h' }
-    );
+
 
 res.json({ token, role: user.role_id, nom: user.nom });
   } catch (err) {
@@ -77,7 +75,7 @@ app.post('/register', async (req, res) => {
     res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
 });
-app.get('/users', async (req, res) => {
+app.get('/users', checkAdmin, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM users');
     res.json(result.rows);
@@ -94,8 +92,8 @@ function checkAdmin(req, res, next) {
   if (!token) return res.status(401).json({ message: 'Token manquant' });
 
   try {
-    const decoded = jwt.verify(token, 'secret_key');
-    if (decoded.role !== 1) { // 1 = Administrateur
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // ← corrigé ici aussi
+    if (decoded.role !== 1) {
       return res.status(403).json({ message: 'Accès interdit' });
     }
     next();
@@ -105,15 +103,11 @@ function checkAdmin(req, res, next) {
 }
 
 // Protéger la route /users
-app.get('/users', checkAdmin, async (req, res) => {
-  const result = await pool.query('SELECT * FROM users');
-  res.json(result.rows);
-});
+
 
 
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Serveur démarré sur http://localhost:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Serveur démarré sur le port ${PORT}`);
 });
-
