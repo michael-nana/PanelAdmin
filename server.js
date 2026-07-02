@@ -7,8 +7,8 @@ const jwt = require('jsonwebtoken');
 const pool = require('./db');
 const cors = require('cors');
 const app = express();
-app.use(express.static('fichiers'));
-app.use(bodyParser.json());
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'fichiers')));app.use(bodyParser.json());
 app.use(cors());
 
 // Vérifier la connexion PostgreSQL
